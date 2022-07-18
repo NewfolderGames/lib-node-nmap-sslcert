@@ -73,22 +73,93 @@ function convertRawJsonToScanResults(xmlInput) {
         const port = parseInt(portItem.$.portid)
         const protocol = portItem.$.protocol
 
-        if (portItem.service) {
-          const service = portItem.service[0].$.name
-          const tunnel = portItem.service[0].$.tunnel
-          const method = portItem.service[0].$.method
-          const product = portItem.service[0].$.tunnel
-        }
-
         let portObject = {}
         if(port) portObject.port = port
         if(protocol) portObject.protocol = protocol
 
         if (portItem.service) {
+          const service = portItem.service[0].$.name
+          const tunnel = portItem.service[0].$.tunnel
+          const method = portItem.service[0].$.method
+          const product = portItem.service[0].$.tunnel
           if(service) portObject.service = service
           if(tunnel) portObject.tunnel = tunnel
           if(method) portObject.method = method
           if(product) portObject.product = product
+        }
+
+        if (Array.isArray(portItem.script)) {
+          const certificate = portItem.script.find((script) => script.$.id === "ssl-cert");
+          if (certificate) {
+            portObject.certificate = {};
+            certificate.table.forEach((table, index) => {
+              switch (table.$.key) {
+                case "subject": {
+                  const subject = {};
+                  table.elem.forEach((elem) => {
+                    switch (elem.$.key) {
+                      case "commonName": subject.commonName = elem._; break;
+                      case "countryName": subject.countryName = elem._; break;
+                      case "organizationName": subject.organizationName = elem._; break;
+                      case "stateOrProvinceName": subject.stateOrProvinceName = elem._; break;
+                    }
+                  });
+                  if (Object.keys(subject).length > 0) portObject.certificate.subject = subject;
+                  break;
+                }
+                case "issuer": {
+                  const issuer = {};
+                  table.elem.forEach((elem) => {
+                    switch (elem.$.key) {
+                      case "commonName": issuer.commonName = elem._; break;
+                      case "countryName": issuer.countryName = elem._; break;
+                      case "organizationName": issuer.organizationName = elem._; break;
+                      case "stateOrProvinceName": issuer.stateOrProvinceName = elem._; break;
+                    }
+                  });
+                  if (Object.keys(issuer).length > 0) portObject.certificate.issuer = issuer;
+                  break;
+                }
+                case "pubkey": {
+                  const pubKey = {};
+                  table.elem.forEach((elem) => {
+                    switch (elem.$.key) {
+                      case "bits": pubKey.bits = elem._; break;
+                      case "exponent": pubKey.exponent = elem._; break;
+                      case "modulus": pubKey.modulus = elem._; break;
+                      case "type": pubKey.type = elem._; break;
+                    }
+                  });
+                  if (Object.keys(pubKey).length > 0) portObject.certificate.pubKey = pubKey;
+                  break;
+                }
+                case "extensions": {
+                  if (Array.isArray(table.table)) {
+                    const extensions = {};
+                    portObject.certificate.extensions = table.table.forEach((extentionTable, extensionTableIndex) => {
+                      let key;
+                      let value;
+                      extentionTable.elem.forEach((elem) => {
+                        if (elem.$.key === "name") key = elem._;
+                        else if (elem.$.key === "value") value = elem._;
+                      });
+                      if (key && value) extensions[key] = value;
+                    });
+                    if (Object.keys(extensions).length > 0) portObject.certificate.extensions = extensions;
+                  }
+                  break;
+                }
+              }
+            });
+            certificate.elem.forEach((elem) => {
+              switch (elem.$.key) {
+                case "sig_algo": certificate.algorithm = elem._; break;
+                case "md5": certificate.md5 = elem._; break;
+                case "sha1": certificate.sha1 = elem._; break;
+                case "pem": certificate.pem = elem._; break;
+              }
+            });
+          }
         }
 
         return portObject
