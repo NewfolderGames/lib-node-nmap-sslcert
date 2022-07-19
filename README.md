@@ -1,5 +1,13 @@
+# Node-NMAP-SSLCERT
+
+This is a fork of [node-nmap](https://github.com/harryhorton/node-nmap) by [Harry Horton](https://github.com/harryhorton).
+
+This fork aims to add the certificate parsing feature, which can be used by adding `--script ssl-cert` to the commandline argument.
+This fork also aims to add back the typing which got removed for some reason.
+
+## Original README
+
 [![Stories in Ready](https://badge.waffle.io/Johnhhorton/node-nmap.png?label=ready&title=Ready)](https://waffle.io/Johnhhorton/node-nmap)
-# Node-NMAP
 
 [![Join the chat at https://gitter.im/Johnhhorton/node-nmap](https://badges.gitter.im/Johnhhorton/node-nmap.svg)](https://gitter.im/Johnhhorton/node-nmap?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 NPM package enabling your [NodeJs] application to interface with the features of [NMAP].  This package requires that [NMAP] is installed and available to the running node application.
