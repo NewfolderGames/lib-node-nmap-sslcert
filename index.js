@@ -92,7 +92,7 @@ function convertRawJsonToScanResults(xmlInput) {
           const certificate = portItem.script.find((script) => script.$.id === "ssl-cert");
           if (certificate) {
             portObject.certificate = {};
-            certificate.table.forEach((table, index) => {
+            certificate.table.forEach((table) => {
               switch (table.$.key) {
                 case "subject": {
                   const subject = {};
@@ -133,20 +133,27 @@ function convertRawJsonToScanResults(xmlInput) {
                   if (Object.keys(pubKey).length > 0) portObject.certificate.pubKey = pubKey;
                   break;
                 }
+                case "validity": {
+                  const validity = {};
+                  table.elem.forEach((elem) => {
+                    if (elem.$.key === "notBefore") validity.notBefore = elem._;
+                    else if (elem.$.key === "notAfter") validity.notAfter = elem._;
+                  });
+                  if (Object.keys(extensions).length > 0) portObject.certificate.extensions = extensions;
+                  break;
+                }
                 case "extensions": {
-                  if (Array.isArray(table.table)) {
-                    const extensions = {};
-                    portObject.certificate.extensions = table.table.forEach((extentionTable, extensionTableIndex) => {
-                      let key;
-                      let value;
-                      extentionTable.elem.forEach((elem) => {
-                        if (elem.$.key === "name") key = elem._;
-                        else if (elem.$.key === "value") value = elem._;
-                      });
-                      if (key && value) extensions[key] = value;
+                  const extensions = {};
+                  portObject.certificate.extensions = table.table.forEach((extentionTable, extensionTableIndex) => {
+                    let key;
+                    let value;
+                    extentionTable.elem.forEach((elem) => {
+                      if (elem.$.key === "name") key = elem._;
+                      else if (elem.$.key === "value") value = elem._;
                     });
-                    if (Object.keys(extensions).length > 0) portObject.certificate.extensions = extensions;
-                  }
+                    if (key && value) extensions[key] = value;
+                  });
+                  if (Object.keys(extensions).length > 0) portObject.certificate.extensions = extensions;
                   break;
                 }
               }
@@ -298,6 +305,7 @@ class NmapScan extends EventEmitter {
     let results;
     //turn NMAP's xml output into a json object
     xml2js.parseString(data, (err, result) => {
+      console.log(data);
       if (err) {
         this.stopTimer();
         this.emit('error', "Error converting XML to JSON in xml2js: " + err);
