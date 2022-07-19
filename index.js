@@ -169,10 +169,10 @@ function convertRawJsonToScanResults(xmlInput) {
             });
             certificate.elem.forEach((elem) => {
               switch (elem.$.key) {
-                case "sig_algo": certificate.algorithm = elem._; break;
-                case "md5": certificate.md5 = elem._; break;
-                case "sha1": certificate.sha1 = elem._; break;
-                case "pem": certificate.pem = elem._; break;
+                case "sig_algo": portObject.certificate.algorithm = elem._; break;
+                case "md5": portObject.certificate.md5 = elem._; break;
+                case "sha1": portObject.certificate.sha1 = elem._; break;
+                case "pem": portObject.certificate.pem = elem._; break;
               }
             });
           }
