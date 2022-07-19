@@ -1,18 +1,26 @@
 import { EventEmitter } from "events";
 
-declare interface HostBase {
+declare interface Host {
 	hostname: string;
+	address: AddressIPv4 | AddressMAC | AddressUnknown;
 	openPorts: Port[];
 	osNmap?: string;
 }
 
-declare interface HostIPv4 extends HostBase {
+declare interface AddressIPv4 {
+	type: "IPv4";
 	ip: string;
 }
 
-declare interface HostMAC extends HostBase {
+declare interface AddressMAC {
+	type: "MAC";
 	mac: string;
 	vendor: string;
+}
+
+declare interface AddressUnknown {
+	type: "UNKNOWN";
+	value: string;
 }
 
 declare interface Port {
@@ -55,8 +63,6 @@ declare interface CertificateValidity {
 	notBefore: string;
 	notAfter: string;
 }
-
-declare type Host = HostIPv4 | HostMAC;
 
 declare type NmapScanEvents = {
 	"complete": (results: Host[]) => any;

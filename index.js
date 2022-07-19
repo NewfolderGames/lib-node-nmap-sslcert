@@ -44,16 +44,28 @@ function convertRawJsonToScanResults(xmlInput) {
 
     //get addresses
     host.address.forEach((address) => {
+      const address = {};
       const addressType = address.$.addrtype
       const addressAdress = address.$.addr
       const addressVendor = address.$.vendor
-
-      if (addressType === 'ipv4') {
-        newHost.ip = addressAdress
-      } else if (addressType === 'mac') {
-        newHost.mac = addressAdress
-        newHost.vendor = addressVendor
+      switch (addressType) {
+        case "ipv4": {
+          address.type = "IPv4";
+          address.ip = addressAdress;
+          break;
+        }
+        case "mac": {
+          address.type = "MAC";
+          address.mac = addressAdress;
+          address.vendor = addressVendor;
+          break;
+        }
+        default: {
+          address.type = "UNKNOWN";
+          address.value = addressAdress;
+        }
       }
+      newHost.address = address;
     })
 
     //get ports
