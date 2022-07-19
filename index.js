@@ -43,11 +43,11 @@ function convertRawJsonToScanResults(xmlInput) {
     }
 
     //get addresses
-    host.address.forEach((address) => {
+    host.address.forEach((addr) => {
       const address = {};
-      const addressType = address.$.addrtype
-      const addressAdress = address.$.addr
-      const addressVendor = address.$.vendor
+      const addressType = addr.$.addrtype
+      const addressAdress = addr.$.addr
+      const addressVendor = addr.$.vendor
       switch (addressType) {
         case "ipv4": {
           address.type = "IPv4";
