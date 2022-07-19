@@ -2,7 +2,7 @@ import { EventEmitter } from "events";
 
 declare interface HostBase {
 	hostname: string;
-	openPorts: [];
+	openPorts: Port[];
 	osNmap?: string;
 }
 
@@ -74,7 +74,7 @@ declare class NmapScan extends EventEmitter {
 	public cancelScan(): void;
 	public startScan(): void;
 
-	public on<Event extends keyof NmapScanEvents>(event: Event, listener: NmapScanEvents[Event]): EventEmitter;
+	public on<Event extends keyof NmapScanEvents>(event: Event, listener: NmapScanEvents[Event]): this;
 
 }
 
@@ -118,7 +118,7 @@ declare class QueuedScan<ActionReturnType = void> extends EventEmitter {
 
 	public percentComplete(): number;
 
-	public on<Event extends keyof NmapScanEvents>(event: Event, listener: NmapScanEvents[Event]): EventEmitter;
+	public on<Event extends keyof NmapScanEvents>(event: Event, listener: NmapScanEvents[Event]): this;
 
 }
 
