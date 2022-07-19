@@ -34,10 +34,7 @@ function convertRawJsonToScanResults(xmlInput) {
   tempHostList = xmlInput.map((host) => {
     const newHost = {
       hostname: null,
-      ip: null,
-      mac: null,
-      openPorts: null,
-      osNmap: null
+      openPorts: [],
     }
 
     //Get hostname
@@ -104,7 +101,7 @@ function convertRawJsonToScanResults(xmlInput) {
                       case "stateOrProvinceName": subject.stateOrProvinceName = elem._; break;
                     }
                   });
-                  if (Object.keys(subject).length > 0) portObject.certificate.subject = subject;
+                  portObject.certificate.subject = subject;
                   break;
                 }
                 case "issuer": {
@@ -117,7 +114,7 @@ function convertRawJsonToScanResults(xmlInput) {
                       case "stateOrProvinceName": issuer.stateOrProvinceName = elem._; break;
                     }
                   });
-                  if (Object.keys(issuer).length > 0) portObject.certificate.issuer = issuer;
+                  portObject.certificate.issuer = issuer;
                   break;
                 }
                 case "pubkey": {
@@ -130,7 +127,7 @@ function convertRawJsonToScanResults(xmlInput) {
                       case "type": pubKey.type = elem._; break;
                     }
                   });
-                  if (Object.keys(pubKey).length > 0) portObject.certificate.pubKey = pubKey;
+                  portObject.certificate.pubKey = pubKey;
                   break;
                 }
                 case "validity": {
@@ -139,7 +136,7 @@ function convertRawJsonToScanResults(xmlInput) {
                     if (elem.$.key === "notBefore") validity.notBefore = elem._;
                     else if (elem.$.key === "notAfter") validity.notAfter = elem._;
                   });
-                  if (Object.keys(extensions).length > 0) portObject.certificate.extensions = extensions;
+                  portObject.certificate.validity = validity;
                   break;
                 }
                 case "extensions": {
@@ -305,7 +302,6 @@ class NmapScan extends EventEmitter {
     let results;
     //turn NMAP's xml output into a json object
     xml2js.parseString(data, (err, result) => {
-      console.log(data);
       if (err) {
         this.stopTimer();
         this.emit('error', "Error converting XML to JSON in xml2js: " + err);
